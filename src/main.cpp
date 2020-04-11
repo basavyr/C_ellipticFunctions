@@ -39,6 +39,30 @@ void printArray(std::vector<double> &array)
     std::cout << "\n";
 }
 
+void mathematicaPrint(std::vector<double> &xData, std::vector<double> &yData)
+{
+    if (xData.size() != yData.size())
+    {
+        std::cout << "Arrays are not valid. Size is different"
+                  << "\n";
+        return;
+    }
+    std::cout << "{ ";
+    for (int i = 0; i < xData.size(); ++i)
+    {
+        if (i == xData.size() - 1)
+        {
+            std::cout << "{ " << xData.at(i) << " , " << yData.at(i) << " }};";
+            std::cout << "\n";
+            return;
+        }
+        else
+        {
+            std::cout << "{ " << xData.at(i) << " , " << yData.at(i) << " }, ";
+        }
+    }
+}
+
 EllipticVariables jacobiAmplitude(double q, double k)
 {
     auto result = new EllipticVariables;
@@ -103,6 +127,26 @@ double V_Rotor(double q, double spin, double oddSpin, double a1, double a2, doub
     return 6969;
 }
 
+void solveForExactParams()
+{
+    const double I = 19 / 2;
+    const double j = 5.5;
+    const double A1 = 0.0312871;
+    const double A2 = 0.0173468;
+    const double A3 = 0.117706;
+    const double theta = -140.0;
+    std::vector<double> qTable;
+    std::vector<double> vTable;
+    for (auto q = -8.0; q < 8.0; q += 0.1)
+    {
+        auto currentV = V_Rotor(q, I, j, A1, A2, A3, theta);
+        qTable.emplace_back(q);
+        vTable.emplace_back(currentV);
+    }
+    mathematicaPrint(qTable, vTable);
+    std::cout << 1.0 / (2.0 * A1) << " " << 1.0 / (2.0 * A2) << " " << 1.0 / (2.0 * A3) << "\n";
+}
+
 int main()
 {
     std::cout << "OK"
@@ -119,6 +163,7 @@ int main()
     const double I = 45.0 / 2.0;
     const double j = 6.5;
     const double theta = 30.0;
+
     auto startTime = std::chrono::high_resolution_clock::now();
     //using u instead of q
     for (double u = -8.0; u < 8; u += 0.1)
@@ -132,10 +177,12 @@ int main()
     }
     auto endTime = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
-    if (qTable.size() == vTable.size())
-    {
-        printArray(qTable);
-        printArray(vTable);
-    }
+    // if (qTable.size() == vTable.size())
+    // {
+    //     printArray(qTable);
+    //     printArray(vTable);
+    // }
+    // mathematicaPrint(qTable, vTable);
+    solveForExactParams();
     std::cout << "Process took..." << static_cast<double>(duration / 1000) << " s\n";
 }
